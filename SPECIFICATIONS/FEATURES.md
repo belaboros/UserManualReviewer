@@ -1,23 +1,27 @@
 # Feature list
 
-Each feature gets its own spec in step 2. Ids are permanent.
+Ids are permanent. Coverage of every acceptance criterion: [TESTS/traceability.md](../TESTS/traceability.md).
 
 | Id | Feature | Spec | Status |
 |---|---|---|---|
-| INGEST | Load journeys and manuals (`journey.yaml`, `manual.yaml`, .md, .html) with line mapping | – | Not started |
-| FIND | Finding model, quote verification, de-duplication | – | Not started |
-| LINK | Broken links and anchors, missing images and alt text, orphan pages | – | Not started |
-| DUP | Duplicate and near-duplicate sections | – | Not started |
-| STRUCT | Step numbering and step order problems | – | Not started |
-| CODE | Malformed code blocks (JSON, YAML, CSV) and conflicting commands | – | Not started |
-| UILABEL | UI labels not matching the reference `ui-strings.json` or each other | – | Not started |
-| TERM | Terminology drift, undefined terms and acronyms | – | Not started |
-| CONSIST | Inconsistencies within one manual (values, versions, labels) | – | Not started |
-| CONTRA | Contradictions across manuals | – | Not started |
-| JOURNEY | Gaps and undocumented steps in the end-to-end journey, prerequisite gaps, missing error paths | – | Not started |
-| LLM | Provider config file, OpenAI-compatible and Claude adapters, structured output, usage and cost | – | Not started |
-| SCORE | Quality score for set, manual and page | – | Not started |
-| RUN | Review runs: orchestration, progress, cancellation, saving and reopening | – | Not started |
-| COMPARE | Side-by-side comparison of two models | – | Not started |
-| GUI | Setup, dashboard, findings table, finding detail, comparison view | – | Not started |
-| EVAL | LLM evaluation: run a model on benchmark sets, score it against `expected-findings.yaml` (recall, precision, F1, verified quotes, valid output, stability, cost, time), eval score and leaderboard | – | Not started |
+| INGEST | Load journeys and manuals (`journey.yaml`, `manual.yaml`, .md, .html) with line mapping | [INGEST](INGEST-load-manuals.md) | Implemented |
+| FIND | Finding model, quote verification, de-duplication | [FIND](FIND-findings-and-verification.md) | Implemented |
+| LINK | Broken links and anchors, missing images and alt text, orphan pages | [LINK](LINK-links-images-orphans.md) | Implemented |
+| DUP | Duplicate and near-duplicate sections | [DUP](DUP-duplicate-sections.md) | Implemented |
+| STRUCT | Step numbering that skips or repeats | [STRUCT](STRUCT-step-numbering.md) | Implemented |
+| CODE | Malformed code blocks (JSON, YAML, CSV) | [CODE](CODE-malformed-code.md) | Implemented |
+| UILABEL | UI labels not matching the reference `ui-strings.json` | [UILABEL](UILABEL-ui-labels.md) | Implemented |
+| VERSION | Version mentions that differ from the manual's version | [VERSION](VERSION-stale-versions.md) | Implemented |
+| LLM | Provider config file, OpenAI-compatible and Claude adapters, structured output, usage and cost | [LLM](LLM-llm-providers.md) | Implemented |
+| PROMPT | Prompt building, context budget and caching layout | [PROMPT](PROMPT-prompt-building.md) | Implemented |
+| CONTRA | Contradictions across manuals | [CONTRA](CONTRA-contradictions.md) | Implemented |
+| CONSIST | Inconsistencies within one manual, step order logic | [CONSIST](CONSIST-consistency.md) | Implemented |
+| JOURNEY | Journey gaps, prerequisite gaps, missing error paths | [JOURNEY](JOURNEY-journey-gaps.md) | Implemented |
+| TERM | Terminology drift, undefined terms and acronyms | [TERM](TERM-terminology.md) | Implemented |
+| SCORE | Quality score for set, manual and page | [SCORE](SCORE-quality-score.md) | Implemented |
+| RUN | Review runs, progress, cancellation, saving, command line | [RUN](RUN-review-runs.md) | Implemented |
+| COMPARE | Side-by-side comparison of two models | [COMPARE](COMPARE-side-by-side-comparison.md) | Implemented |
+| EVAL | LLM evaluation against an answer key, eval score, leaderboard | [EVAL](EVAL-llm-evaluation.md) | Implemented |
+| GUI | Setup, dashboard, findings, finding detail, compare, evaluate, leaderboard | [GUI](GUI-desktop-app.md) | Implemented |
+
+"Implemented" means built and tested; all specs were approved by the owner's go-ahead on 2026-10-10 and are being validated in owner testing.

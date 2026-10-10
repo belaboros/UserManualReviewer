@@ -10,3 +10,7 @@ benchmarks:
   shopflow:
     journey: samples/shopflow/journey.yaml
     answer_key: samples/shopflow/expected-findings.yaml
+# Clarifications (spec SPECIFICATIONS/EVAL-llm-evaluation.md):
+# - benchmark paths are relative to the repository root (the parent of this config folder)
+# - matching ignores category; ties prefer the exact, then an accepted category
+# - by default only `tier: llm` key entries and LLM-check findings are scored (`include_rules` counts all)

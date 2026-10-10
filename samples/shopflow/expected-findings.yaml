@@ -1,0 +1,550 @@
+# Machine-readable answer key for the ShopFlow benchmark (ADR-0013, spec EVAL).
+# Built from ANSWER_KEY.md: one entry per distinct planted problem (68). Entries marked
+# "same as ..." there are merged into the entry they repeat. Never feed this file to a review.
+#
+# page    = "<manual_id>/<path relative to the manual folder>"
+# quote   = verbatim readable text that umr.app.verify.locate_quote finds on that page
+#           (image findings quote the image path, since the image has no readable text)
+# tier    = rule: a deterministic check finds it; llm: only an LLM check can find it.
+#           By default only tier "llm" entries are scored.
+version: "1"
+benchmark: shopflow
+findings:
+  # ---------- 1. Duplicate sections ----------
+  - id: D1
+    category: duplicate
+    severity: minor
+    title: '"Adding products to the cart" section duplicated'
+    tier: rule
+    locations:
+      - { page: order-capturing/01-getting-started.md, quote: "1.3 Adding products to the cart" }
+      - { page: order-capturing/02-creating-an-order.md, quote: "2.2 Adding products to the cart" }
+  - id: D2
+    category: duplicate
+    severity: minor
+    title: 'Maximum parcel weight sentence repeated in two pages'
+    accept_categories: [inconsistency]
+    locations:
+      - { page: delivery/picking.html, quote: "Weigh the parcel. The maximum parcel weight is 30 kg" }
+      - { page: delivery/statuses.html, quote: "The maximum parcel weight is 30 kg." }
+
+  # ---------- 2. Missing references ----------
+  - id: R1
+    category: broken-link
+    severity: major
+    title: 'Links to payment-methods.md, which does not exist'
+    tier: rule
+    locations:
+      - { page: order-capturing/index.md, quote: "Payment methods" }
+      - { page: order-capturing/02-creating-an-order.md, quote: "See Payment methods for details." }
+  - id: R2
+    category: broken-anchor
+    severity: minor
+    title: 'Anchor #discount-codes does not exist'
+    tier: rule
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "To apply a discount, see Discount codes." }
+  - id: R3
+    category: broken-anchor
+    severity: minor
+    title: 'Link to statuses.html#order-statuses; the anchor is #delivery-statuses'
+    tier: rule
+    locations:
+      - { page: order-capturing/03-order-statuses.md, quote: "See the Delivery manual, section \"Order statuses\"" }
+  - id: R4
+    category: broken-link
+    severity: major
+    title: 'Contents links to returns.html, which does not exist'
+    tier: rule
+    locations:
+      - { page: delivery/index.html, quote: "Returns" }
+  - id: R5
+    category: broken-anchor
+    severity: minor
+    title: 'Section "Delivery Address Validation" does not exist in Order Capturing'
+    tier: rule
+    accept_categories: [broken-link]
+    locations:
+      - { page: delivery/picking.html, quote: "follow the procedure in the Order Capturing manual, section" }
+  - id: R6
+    category: image
+    severity: minor
+    title: 'Images picking-queue.png and route-assignment.png missing; first has no alt text'
+    tier: rule
+    locations:
+      - { page: delivery/picking.html, quote: "images/picking-queue.png" }
+      - { page: delivery/dispatch.html, quote: "images/route-assignment.png" }
+  - id: R7
+    category: broken-link
+    severity: minor
+    title: 'Links to template-preview.md, which does not exist'
+    tier: rule
+    locations:
+      - { page: notification/events.md, quote: "See Template preview to check the result before saving." }
+  - id: R8
+    category: orphan-page
+    severity: minor
+    title: 'Bulk import page is not linked from anywhere'
+    tier: rule
+    locations:
+      - { page: order-capturing/05-bulk-import.md, quote: "5. Bulk order import" }
+
+  # ---------- 3. Inconsistencies within one manual ----------
+  - id: I1
+    category: inconsistency
+    severity: major
+    title: 'Maximum line items per order 50 vs 100'
+    accept_categories: [value-conflict]
+    locations:
+      - { page: order-capturing/01-getting-started.md, quote: "You can add up to 50 line items to one order." }
+      - { page: order-capturing/02-creating-an-order.md, quote: "You can add up to 50 line items to one order." }
+      - { page: order-capturing/04-troubleshooting.md, quote: "An order can contain at most 100 line items." }
+  - id: I2
+    category: inconsistency
+    severity: minor
+    title: 'Button called Submit Order vs Place Order'
+    accept_categories: [ui-label, terminology]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "Accept the terms and conditions. Click Submit Order." }
+      - { page: order-capturing/04-troubleshooting.md, quote: "The Place Order button stays disabled until you accept the terms" }
+  - id: I3
+    category: inconsistency
+    severity: minor
+    title: 'Order number format ORD-123456 (6 digits) vs ORD-12345678 (8 digits)'
+    accept_categories: [value-conflict]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "assigns an order number in the format ORD-123456 (six digits)" }
+      - { page: order-capturing/03-order-statuses.md, quote: "The order number format is ORD-12345678." }
+  - id: I4
+    category: inconsistency
+    severity: major
+    title: 'Maximum parcel weight 30 kg vs 25 kg'
+    accept_categories: [value-conflict, contradiction]
+    locations:
+      - { page: delivery/picking.html, quote: "The maximum parcel weight is 30 kg" }
+      - { page: delivery/statuses.html, quote: "The maximum parcel weight is 30 kg." }
+      - { page: delivery/dispatch.html, quote: "Parcels heavier than 25 kg must not be loaded onto delivery vans." }
+  - id: I5
+    category: stale-version
+    severity: minor
+    title: 'Chapter mentions ShopFlow 3.2 in a 3.4 manual'
+    tier: rule
+    accept_categories: [inconsistency]
+    locations:
+      - { page: order-capturing/index.md, quote: "Version: ShopFlow 3.4 · Audience: Sales agents and customer service staff" }
+      - { page: order-capturing/02-creating-an-order.md, quote: "This chapter describes the full order capturing flow in ShopFlow 3.2." }
+  - id: I6
+    category: step-order
+    severity: minor
+    title: 'Step numbering skips 4 in "Submitting the order"'
+    tier: rule
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "Accept the terms and conditions. Click Submit Order." }
+  - id: I7
+    category: inconsistency
+    severity: minor
+    title: 'Role called Warehouse Operator vs Warehouse role'
+    accept_categories: [terminology]
+    locations:
+      - { page: delivery/index.html, quote: "A ShopFlow account with the Warehouse Operator role." }
+      - { page: delivery/picking.html, quote: "with your Warehouse role and click Picking" }
+  - id: I8
+    category: inconsistency
+    severity: major
+    title: 'SMTP port 587 vs 465'
+    accept_categories: [value-conflict]
+    locations:
+      - { page: notification/channels.md, quote: "SMTP port 587 (STARTTLS)" }
+      - { page: notification/channels.md, quote: "If the test fails, check that port 465 is open in the firewall." }
+  - id: I9
+    category: inconsistency
+    severity: major
+    title: 'Test command shopflow-notify test --channel=email vs shopflow notify test -c email'
+    accept_categories: [value-conflict, malformed-code, terminology]
+    locations:
+      - { page: notification/index.md, quote: "shopflow-notify test --channel=email --to=agent@example.com" }
+      - { page: notification/channels.md, quote: "shopflow notify test -c email" }
+  - id: I10
+    category: inconsistency
+    severity: major
+    title: 'Template uses {{customerName}}/{{orderId}}, documented variables are {{customer_name}}/{{order_id}}'
+    accept_categories: [undefined-term, malformed-code, terminology]
+    locations:
+      - { page: notification/events.md, quote: "Hello {{customerName}}," }
+      - { page: notification/events.md, quote: "your order {{orderId}} is on its way. Track it here: {{tracking_url}}" }
+  - id: I11
+    category: inconsistency
+    severity: major
+    title: 'Bulk-imported orders skip payment and go straight to Confirmed'
+    accept_categories: [contradiction, journey-gap]
+    locations:
+      - { page: order-capturing/05-bulk-import.md, quote: "Imported orders get the status Confirmed immediately and skip payment." }
+      - { page: order-capturing/02-creating-an-order.md, quote: "When payment is confirmed, the status changes to Confirmed" }
+      - { page: order-capturing/03-order-statuses.md, quote: "Payment was received; the order is ready for the warehouse." }
+
+  # ---------- 4. Contradictions across manuals ----------
+  - id: C1
+    category: contradiction
+    severity: major
+    title: 'Paid order status is Confirmed in Order Capturing but Paid in Delivery'
+    accept_categories: [inconsistency, terminology]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "When payment is confirmed, the status changes to Confirmed" }
+      - { page: order-capturing/03-order-statuses.md, quote: "Confirmed Payment was received; the order is ready for the warehouse." }
+      - { page: delivery/picking.html, quote: "Orders appear in the Picking queue once they have the status Paid" }
+      - { page: delivery/statuses.html, quote: "Paid Payment received; waiting to be released to picking." }
+  - id: C2
+    category: contradiction
+    severity: major
+    title: 'Cancellation only while Submitted vs until Shipped'
+    accept_categories: [inconsistency]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "An order can be cancelled only while it has the status Submitted." }
+      - { page: delivery/dispatch.html, quote: "Orders can be cancelled at any time until they reach the status Shipped" }
+  - id: C3
+    category: contradiction
+    severity: major
+    title: 'Postal code optional vs orders without postal code cannot be dispatched'
+    accept_categories: [inconsistency, journey-gap]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "City Yes Postal code No" }
+      - { page: delivery/dispatch.html, quote: "Orders without a postal code cannot be dispatched." }
+  - id: C4
+    category: contradiction
+    severity: major
+    title: 'Confirmation e-mail within 5 minutes vs batched every 15 minutes'
+    accept_categories: [inconsistency, value-conflict]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "The customer receives an order confirmation e-mail within 5 minutes." }
+      - { page: order-capturing/04-troubleshooting.md, quote: "Confirmation e-mails are sent within 5 minutes." }
+      - { page: notification/channels.md, quote: "To reduce load, e-mails are sent in batches every 15 minutes." }
+  - id: C5
+    category: contradiction
+    severity: major
+    title: 'Customers can opt out of all e-mails vs transactional e-mails cannot be disabled'
+    accept_categories: [inconsistency]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "Customers can opt out of all e-mail notifications in their account settings." }
+      - { page: notification/index.md, quote: "Transactional messages (order confirmation, shipping updates) are always sent and cannot be disabled." }
+  - id: C6
+    category: contradiction
+    severity: major
+    title: 'Out-for-delivery SMS promised, but SMS is not supported in 3.4'
+    accept_categories: [inconsistency, journey-gap]
+    locations:
+      - { page: delivery/dispatch.html, quote: "When the driver starts the route, the customer receives an" }
+      - { page: notification/channels.md, quote: "SMS Not supported (planned for 4.0)" }
+  - id: C7
+    category: contradiction
+    severity: major
+    title: 'Order sent to the warehouse automatically vs released manually by a supervisor'
+    accept_categories: [inconsistency, journey-gap]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "the order is automatically sent to the warehouse for delivery" }
+      - { page: delivery/picking.html, quote: "and have been released by the warehouse supervisor" }
+  - id: C8
+    category: contradiction
+    severity: minor
+    title: 'Order status lists differ between Order Capturing and Delivery'
+    accept_categories: [inconsistency, journey-gap]
+    locations:
+      - { page: order-capturing/03-order-statuses.md, quote: "Shipped The order has left the warehouse." }
+      - { page: order-capturing/03-order-statuses.md, quote: "Status changes after Confirmed are made by the delivery team." }
+      - { page: delivery/statuses.html, quote: "Picking An operator is picking the order." }
+      - { page: delivery/statuses.html, quote: "Ready for dispatch The parcel is packed and labelled." }
+      - { page: delivery/statuses.html, quote: "Out for delivery The driver has started the route." }
+      - { page: delivery/statuses.html, quote: "Delivery failed Delivery was attempted but not completed." }
+      - { page: delivery/statuses.html, quote: "Returned The parcel is back in the warehouse." }
+
+  # ---------- 5. Gaps in the end-to-end journey ----------
+  - id: G1
+    category: journey-gap
+    severity: major
+    title: 'How and by whom orders are released to the picking queue is undocumented'
+    accept_categories: [prerequisite, undefined-term]
+    locations:
+      - { page: delivery/picking.html, quote: "Orders that are not released stay invisible to warehouse operators." }
+  - id: G2
+    category: journey-gap
+    severity: major
+    title: 'No notification event for Out for delivery or Delivery failed'
+    accept_categories: [contradiction, inconsistency]
+    locations:
+      - { page: delivery/dispatch.html, quote: "When the driver starts the route, the customer receives an" }
+      - { page: delivery/dispatch.html, quote: "If nobody is at home, click Delivery failed" }
+      - { page: notification/events.md, quote: "OrderDelivered The order status becomes Delivered Push order-delivered" }
+  - id: G3
+    category: journey-gap
+    severity: major
+    title: 'Reschedule link for failed deliveries is not documented'
+    accept_categories: [undefined-term, missing-error-path]
+    locations:
+      - { page: delivery/dispatch.html, quote: "can choose a new delivery date using the reschedule link in the notification" }
+  - id: G4
+    category: journey-gap
+    severity: major
+    title: 'Nobody owns orders on the Address hold shelf'
+    accept_categories: [missing-error-path]
+    locations:
+      - { page: delivery/dispatch.html, quote: "The parcel is moved to the Address hold shelf." }
+  - id: G5
+    category: journey-gap
+    severity: major
+    title: 'What happens after a parcel is returned is undocumented'
+    accept_categories: [missing-error-path]
+    locations:
+      - { page: delivery/dispatch.html, quote: "After three failed attempts the parcel is returned to the warehouse." }
+      - { page: delivery/statuses.html, quote: "Returned The parcel is back in the warehouse." }
+  - id: G6
+    category: journey-gap
+    severity: major
+    title: 'How payment moves an order from Submitted to Confirmed is undocumented'
+    accept_categories: [prerequisite]
+    locations:
+      - { page: order-capturing/03-order-statuses.md, quote: "Submitted The order was submitted; payment is pending." }
+      - { page: order-capturing/02-creating-an-order.md, quote: "When payment is confirmed, the status changes to Confirmed" }
+  - id: G7
+    category: journey-gap
+    severity: minor
+    title: 'No instructions for pairing the handheld scanner'
+    accept_categories: [prerequisite]
+    locations:
+      - { page: delivery/index.html, quote: "A handheld scanner paired with your account." }
+
+  # ---------- 6. Extra checks (X14, X18, X22, X24, X30, X36, X39 merged above) ----------
+  - id: X1
+    category: broken-link
+    severity: major
+    title: 'Contents links to dispatch.htm; the file is dispatch.html'
+    tier: rule
+    locations:
+      - { page: delivery/index.html, quote: "Dispatch and delivery" }
+  - id: X2
+    category: broken-anchor
+    severity: minor
+    title: 'Anchor #logging-in-to-shopflow does not exist'
+    tier: rule
+    locations:
+      - { page: order-capturing/04-troubleshooting.md, quote: "See also Logging in." }
+  - id: X3
+    category: broken-anchor
+    severity: minor
+    title: 'Anchor dispatch.html#failed-delivery does not exist'
+    tier: rule
+    locations:
+      - { page: notification/events.md, quote: "For delivery failures, see Failed delivery." }
+  - id: X4
+    category: terminology
+    severity: minor
+    title: '"customer" vs "buyer"'
+    locations:
+      - { page: order-capturing/04-troubleshooting.md, quote: "Ask the buyer to check the spam folder." }
+      - { page: order-capturing/02-creating-an-order.md, quote: "In the Customer field, search by customer name" }
+  - id: X5
+    category: terminology
+    severity: minor
+    title: 'Preferences › Language vs Settings › Language'
+    accept_categories: [inconsistency, ui-label]
+    locations:
+      - { page: order-capturing/01-getting-started.md, quote: "click your name in the top bar and select Preferences › Language" }
+      - { page: order-capturing/04-troubleshooting.md, quote: "Open Settings › Language and choose your language." }
+  - id: X6
+    category: terminology
+    severity: minor
+    title: 'Admin › Notifications vs Settings › Notifications'
+    accept_categories: [inconsistency, ui-label]
+    locations:
+      - { page: notification/channels.md, quote: "Go to Admin › Notifications › E-mail and enter:" }
+      - { page: notification/events.md, quote: "Go to Settings › Notifications › Templates." }
+  - id: X7
+    category: terminology
+    severity: minor
+    title: '"consignee" used instead of "customer" and never defined'
+    accept_categories: [undefined-term]
+    locations:
+      - { page: delivery/index.html, quote: "and how drivers deliver them to the consignee" }
+      - { page: delivery/dispatch.html, quote: "2.2 Delivering to the consignee" }
+      - { page: delivery/statuses.html, quote: "Delivered The consignee signed for the parcel." }
+  - id: X8
+    category: ui-label
+    severity: minor
+    title: 'Button Submit Order; ui-strings says Place Order'
+    tier: rule
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "Accept the terms and conditions. Click Submit Order." }
+  - id: X9
+    category: ui-label
+    severity: minor
+    title: 'Button Load; ui-strings says Load parcel'
+    tier: rule
+    locations:
+      - { page: delivery/dispatch.html, quote: "The order status changes to Shipped" }
+  - id: X10
+    category: ui-label
+    severity: minor
+    title: 'Button Delivered; ui-strings says Mark as delivered'
+    tier: rule
+    locations:
+      - { page: delivery/dispatch.html, quote: "The delivery log is written to /var/log/shopflow/delivery.log" }
+  - id: X11
+    category: ui-label
+    severity: minor
+    title: 'Settings › Language and Settings › Notifications › Templates are not in ui-strings'
+    tier: rule
+    locations:
+      - { page: order-capturing/04-troubleshooting.md, quote: "Open Settings › Language and choose your language." }
+      - { page: notification/events.md, quote: "Go to Settings › Notifications › Templates." }
+  - id: X12
+    category: prerequisite
+    severity: major
+    title: 'Payment Terminal add-on is never explained or set up'
+    accept_categories: [undefined-term, journey-gap]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "For card payments taken over the phone, use the Payment Terminal add-on." }
+  - id: X13
+    category: prerequisite
+    severity: minor
+    title: 'Notification Admin role required, but how to get it is not explained'
+    accept_categories: [journey-gap]
+    locations:
+      - { page: notification/channels.md, quote: "Only users with the Notification Admin role can open this screen." }
+  - id: X15
+    category: step-order
+    severity: major
+    title: 'Saved address is picked before the customer is created'
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "Select the customer's saved delivery address from the Address book." }
+      - { page: order-capturing/02-creating-an-order.md, quote: "If the customer does not exist, click Create customer" }
+  - id: X16
+    category: step-order
+    severity: major
+    title: 'Parcels are assigned to routes that are only created at the end of the day'
+    accept_categories: [journey-gap, inconsistency]
+    locations:
+      - { page: delivery/dispatch.html, quote: "Assign the parcel to a route." }
+      - { page: delivery/dispatch.html, quote: "At the end of each day the dispatcher creates the next day's routes" }
+  - id: X17
+    category: step-order
+    severity: minor
+    title: 'Preview before saving comes after Save, and step 3 is repeated'
+    locations:
+      - { page: notification/events.md, quote: "Edit the text and click Save." }
+      - { page: notification/events.md, quote: "Click Preview to check the result before saving." }
+  - id: X19
+    category: undefined-term
+    severity: minor
+    title: '"SLA" is not defined'
+    accept_categories: [terminology]
+    locations:
+      - { page: delivery/picking.html, quote: "Orders close to breaching the picking SLA are shown in red." }
+  - id: X20
+    category: undefined-term
+    severity: minor
+    title: '"ASN" is not defined and sending it is not explained'
+    accept_categories: [terminology, prerequisite, journey-gap]
+    locations:
+      - { page: delivery/dispatch.html, quote: "Send the ASN to the carrier." }
+  - id: X21
+    category: undefined-term
+    severity: info
+    title: '"wms" in the URL is never explained'
+    accept_categories: [terminology]
+    locations:
+      - { page: delivery/picking.html, quote: "log in to https://shopflow.example.com/wms with your Warehouse role" }
+  - id: X23
+    category: orphan-page
+    severity: minor
+    title: 'Legacy SMS page is not linked from anywhere'
+    tier: rule
+    locations:
+      - { page: notification/legacy-sms.md, quote: "Legacy SMS gateway" }
+  - id: X25
+    category: stale-version
+    severity: minor
+    title: '"Last updated: March 2022" in a 3.4 manual'
+    accept_categories: [inconsistency]
+    locations:
+      - { page: delivery/index.html, quote: "Audience: Warehouse staff and drivers · Last updated: March 2022" }
+  - id: X26
+    category: stale-version
+    severity: major
+    title: 'Classic Dispatch screen used, but Classic screens were removed in 3.0'
+    accept_categories: [contradiction, inconsistency]
+    locations:
+      - { page: delivery/dispatch.html, quote: "If your site still uses the Classic Dispatch screen" }
+      - { page: delivery/index.html, quote: "Note: all Classic screens were removed in ShopFlow 3.0." }
+  - id: X27
+    category: stale-version
+    severity: minor
+    title: 'Legacy SMS page describes enabling SMS for 2.x, unsupported in 3.4 and unbatched'
+    accept_categories: [contradiction, inconsistency]
+    locations:
+      - { page: notification/legacy-sms.md, quote: "ShopFlow 2.x sent SMS through the Twilight SMS gateway." }
+      - { page: notification/legacy-sms.md, quote: "SMS messages are sent immediately, without batching." }
+      - { page: notification/channels.md, quote: "SMS Not supported (planned for 4.0)" }
+  - id: X28
+    category: value-conflict
+    severity: minor
+    title: 'Session timeout 15 vs 30 minutes'
+    accept_categories: [inconsistency, contradiction]
+    locations:
+      - { page: order-capturing/01-getting-started.md, quote: "Your session ends after 15 minutes of inactivity." }
+      - { page: order-capturing/04-troubleshooting.md, quote: "Sessions expire after 30 minutes of inactivity." }
+  - id: X29
+    category: value-conflict
+    severity: minor
+    title: 'Notification log path differs'
+    accept_categories: [inconsistency, contradiction]
+    locations:
+      - { page: notification/index.md, quote: "Notification logs are written to /opt/shopflow/logs/notification.log." }
+      - { page: notification/channels.md, quote: "Logs are written to /var/log/shopflow/notify.log." }
+  - id: X31
+    category: missing-error-path
+    severity: major
+    title: 'No guidance if order submission or payment fails'
+    accept_categories: [journey-gap]
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "Review the order summary on the right side of the screen." }
+      - { page: order-capturing/02-creating-an-order.md, quote: "Accept the terms and conditions. Click Submit Order." }
+  - id: X32
+    category: missing-error-path
+    severity: minor
+    title: 'No guidance if a barcode won''t scan or a product isn''t on the shelf'
+    accept_categories: [journey-gap]
+    locations:
+      - { page: delivery/picking.html, quote: "Scan each product's barcode with the handheld scanner." }
+  - id: X33
+    category: missing-error-path
+    severity: minor
+    title: 'No recovery steps when saving a template fails'
+    accept_categories: [journey-gap]
+    locations:
+      - { page: notification/events.md, quote: "If Save fails, the template is not changed." }
+  - id: X34
+    category: malformed-code
+    severity: minor
+    title: 'notify.json has a trailing comma and a missing comma'
+    tier: rule
+    locations:
+      - { page: notification/channels.md, quote: "\"port\": 587, } \"sender\": \"orders@shopflow.example\"" }
+  - id: X35
+    category: malformed-code
+    severity: minor
+    title: 'CSV rows 2 and 3 have 3 and 5 columns; the header has 4'
+    tier: rule
+    locations:
+      - { page: order-capturing/05-bulk-import.md, quote: "C-1002;SKU-312;1 C-1003;SKU-778;5;1132;express" }
+  - id: X37
+    category: image
+    severity: minor
+    title: 'Image order-summary.png missing and without alt text'
+    tier: rule
+    locations:
+      - { page: order-capturing/02-creating-an-order.md, quote: "images/order-summary.png" }
+  - id: X38
+    category: image
+    severity: minor
+    title: 'Image template-editor.png missing'
+    tier: rule
+    locations:
+      - { page: notification/events.md, quote: "images/template-editor.png" }

@@ -10,7 +10,7 @@ The owner wants a desktop application with a user-friendly GUI that shows review
 Use **Python 3.12** for all code and **PySide6** (Qt 6, official Qt for Python bindings, LGPL) for the GUI:
 - Qt Widgets for the main window, tables and forms
 - Qt Charts for gauges, bar charts and heatmaps
-- `QWebEngineView` to render passages and comparisons as HTML
+- `QTextBrowser` to render passages and comparisons as HTML (lighter than `QWebEngineView`, which can be added later if richer HTML is needed)
 
 Tooling: `uv` for environments and dependencies, `pytest` and `pytest-qt` for tests, `ruff` for lint and format, `mypy` for types.
 
@@ -18,7 +18,7 @@ Tooling: `uv` for environments and dependencies, `pytest` and `pytest-qt` for te
 - One language for core and GUI; the core is testable without Qt.
 - Strong libraries are available for the core work: `markdown-it-py`, `beautifulsoup4`/`lxml`, `pydantic`, `httpx`, `openai`, `anthropic`, `rapidfuzz`.
 - Desktop packaging (PyInstaller or Briefcase) needs its own decision later.
-- Qt layouts are less flexible than web CSS; HTML views fill that gap where richer rendering is needed.
+- Qt layouts are less flexible than web CSS; HTML in `QTextBrowser` fills that gap where richer rendering is needed.
 
 ## Alternatives considered
 - **Electron + React (TypeScript)** – best-looking UI options, but two languages and a separate backend process for the parsing and LLM logic; heavier install.

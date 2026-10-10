@@ -299,12 +299,12 @@ Default weights: critical 10, major 5, minor 2, info 0.5; default `k` = 20. A fi
 | **Setup** | Journey picker, manuals list, check list with tick boxes (and "all"), model A, optional model B |
 | **Dashboard** | Score gauges for set and each manual, heatmap of pages × categories, counts by severity |
 | **Findings** | Filterable table (category, severity, manual, verified, source model) |
-| **Finding detail** | Source passages rendered side by side with the quoted text highlighted, explanation, suggested fix |
+| **Finding detail** | Below the findings table: source passages side by side with ±5 lines of context and the quoted lines highlighted, explanation, suggested fix |
 | **Compare** | Both found / only A / only B, scores, tokens, cost, duration |
 | **Evaluate** | Pick a model and benchmark, run, see metrics per category, missed and unexpected findings |
 | **Leaderboard** | All evaluated models ranked by eval score, with recall, precision, cost and duration |
 
-Long-running work runs in a `QThreadPool` worker; the GUI only receives progress and result signals. Rich content (passages, the comparison) is rendered as HTML in `QWebEngineView`; charts use Qt Charts ([ADR-0002](../adr/0002-python-and-pyside6.md)).
+Long-running work runs in a `QThreadPool` worker; the GUI only receives progress and result signals. Rich content (passages, the comparison) is rendered as HTML in `QTextBrowser`; score rings, severity bars and the heatmap are custom-painted widgets ([ADR-0002](../adr/0002-python-and-pyside6.md)).
 
 ## 13. Configuration and files
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from rapidfuzz import fuzz
@@ -16,9 +16,15 @@ def _norm(s: str) -> str:
     return " ".join(s.lower().split())
 
 
+def _page_level(loc: Location) -> bool:
+    return loc.line_start is None and not loc.quote.strip()
+
+
 def locations_match(a: Location, b: Location, quote_similarity: float = QUOTE_SIMILARITY) -> bool:
     if a.page_id != b.page_id:
         return False
+    if _page_level(a) or _page_level(b):  # e.g. an orphan page: the location is the whole page
+        return True
     if (a.line_start is not None and b.line_start is not None):
         a_end = a.line_end or a.line_start
         b_end = b.line_end or b.line_start
@@ -72,4 +78,40 @@ def pair_items(a: Sequence[tuple[str, Sequence[Location]]], b: Sequence[tuple[st
             pairs.append((i, best_j))
     paired_a = {i for i, _ in pairs}
     return Pairing(pairs=pairs, only_a=[i for i in range(len(a)) if i not in paired_a],
+                   only_b=[j for j in range(len(b)) if j not in used_b])
+
+
+def pair_best(a: Sequence[Sequence[Location]], b: Sequence[Sequence[Location]],
+              allowed: Callable[[int, int], bool] | None = None,
+              preferred: Callable[[int, int], int] | None = None,
+              quote_similarity: float = QUOTE_SIMILARITY) -> Pairing:
+    """Globally greedy one-to-one pairing of location lists.
+
+    Every matching pair (`findings_match`) is a candidate; candidates are taken in order of
+    location overlap (higher first), then higher `preferred` rank (e.g. 2 = same category, 1 = accepted
+    category), then input order.
+    `allowed` filters candidates (e.g. same category only).
+    """
+    candidates: list[tuple[int, int, int, int]] = []
+    for i, locs_a in enumerate(a):
+        for j, locs_b in enumerate(b):
+            if allowed is not None and not allowed(i, j):
+                continue
+            if findings_match(locs_a, locs_b, quote_similarity):
+                score = min(location_overlap(locs_a, locs_b, quote_similarity),
+                            location_overlap(locs_b, locs_a, quote_similarity))
+                pref = preferred(i, j) if preferred is not None else 0
+                candidates.append((-score, -pref, i, j))
+    candidates.sort()
+    used_a: set[int] = set()
+    used_b: set[int] = set()
+    pairs: list[tuple[int, int]] = []
+    for _, _, i, j in candidates:
+        if i in used_a or j in used_b:
+            continue
+        used_a.add(i)
+        used_b.add(j)
+        pairs.append((i, j))
+    pairs.sort()
+    return Pairing(pairs=pairs, only_a=[i for i in range(len(a)) if i not in used_a],
                    only_b=[j for j in range(len(b)) if j not in used_b])
