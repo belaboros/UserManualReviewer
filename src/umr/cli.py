@@ -45,7 +45,8 @@ def print_run(run: ReviewRun) -> None:
     s = run.score_for("set")
     print(f"\n{run.journey_name}  ·  model: {run.model or 'rules only'}")
     if s:
-        print(f"Quality score (set): {s.value:.1f}%   findings: {len(run.findings)}")
+        failed = f"   (incomplete: {len(run.errors)} check(s) failed)" if run.errors else ""
+        print(f"Quality score (set): {s.value:.1f}%   findings: {len(run.findings)}{failed}")
     for score in run.scores:
         if score.level == Scope.MANUAL:
             print(f"  {score.target:<24} {score.value:5.1f}%  ({score.finding_count} findings)")

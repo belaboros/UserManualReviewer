@@ -26,3 +26,4 @@
 
 - Owner report: local LLM calls fail. Added a call log (AC-LLM-22…27): every request (URL, model, full body) and its response or error (HTTP status and the server's response body) goes to `~/.user-manual-reviewer/logs/llm-calls-YYYY-MM-DD.jsonl`; keys are never logged.
 - `umr -v` prints a summary line per call; the GUI run log shows the same lines; `umr providers --test NAME` sends one tiny request.
+- First real local run (LM Studio, Nemotron 30B reasoning model): both calls stopped with `finish_reason=length` after 4,316 in + 3,876 out = 8,192 tokens, all reasoning and no answer, so the server context was 8k. Added AC-LLM-28: a token-limit stop without JSON is reported at once with the fix (larger server context, or `max_output_tokens`) instead of a retry and "not valid JSON". The CLI marks the set score as incomplete when checks failed.

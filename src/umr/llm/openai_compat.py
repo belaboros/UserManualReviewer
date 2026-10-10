@@ -8,7 +8,7 @@ from typing import Any
 import openai
 
 from umr.domain import Usage
-from umr.llm.base import LlmError, LlmProvider, LlmResult, ProviderConfig, StructuredOutput
+from umr.llm.base import LlmError, LlmProvider, LlmResult, ProviderConfig, StructuredOutput, token_limit_error
 from umr.llm.calllog import CallRecord
 from umr.llm.config import get_api_key
 from umr.llm.cost import cost_usd
@@ -94,7 +94,13 @@ class OpenAICompatibleProvider(LlmProvider):
         usage = self.usage_from(response, duration)
         record.ok(raw_text=text, response=response, duration_s=duration, input_tokens=usage.input_tokens,
                   output_tokens=usage.output_tokens, finish_reason=getattr(choice, "finish_reason", None))
-        return LlmResult(data=extract_json(text), raw_text=text, usage=usage,
+        data = extract_json(text)
+        if data is None and getattr(choice, "finish_reason", None) == "length":
+            details = getattr(getattr(response, "usage", None), "completion_tokens_details", None)
+            raise token_limit_error(self.name, input_tokens=usage.input_tokens, output_tokens=usage.output_tokens,
+                                    max_output_tokens=self.config.max_output_tokens,
+                                    reasoning_tokens=int(getattr(details, "reasoning_tokens", 0) or 0))
+        return LlmResult(data=data, raw_text=text, usage=usage,
                          model=getattr(response, "model", "") or self.config.model)
 
     def usage_from(self, response: Any, duration_s: float) -> Usage:

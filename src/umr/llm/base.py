@@ -80,3 +80,24 @@ class LlmProvider(ABC):
 
     def estimate_tokens(self, text: str) -> int:
         return len(text) // 4 + 1
+
+
+def token_limit_error(name: str, *, input_tokens: int, output_tokens: int, max_output_tokens: int,
+                      reasoning_tokens: int = 0) -> LlmError:
+    """The model stopped at a token limit before writing a usable answer (AC-LLM-28).
+
+    Retrying would hit the same limit, so this is reported at once with what to change.
+    """
+    used = f"{input_tokens:,} in + {output_tokens:,} out tokens"
+    if reasoning_tokens:
+        used += f", {reasoning_tokens:,} of them reasoning"
+    if output_tokens < max_output_tokens * 0.95:
+        total = input_tokens + output_tokens
+        return LlmError(
+            f"{name}: the model ran out of context before it wrote the answer ({used}). It stopped below "
+            f"max_output_tokens ({max_output_tokens:,}), so the server's context length is about {total:,} "
+            f"tokens. Load the model with a larger context, at least 32k (LM Studio: model load settings, "
+            f"Context Length; Ollama: num_ctx), and set context_tokens in the provider config to match.")
+    return LlmError(
+        f"{name}: the model reached max_output_tokens ({max_output_tokens:,}) before it wrote the answer "
+        f"({used}). Raise max_output_tokens in the provider config, or lower the reasoning effort.")

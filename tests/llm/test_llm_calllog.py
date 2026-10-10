@@ -163,3 +163,42 @@ def test_AC_LLM_27_unwritable_log_never_breaks_a_call(monkeypatch: pytest.Monkey
     result = call(openai_provider(lambda r: httpx2.Response(200, json=completion('{"findings": []}'))))
     assert result.data == {"findings": []}
 
+
+
+def truncated(content: str, out: int, reasoning: int = 0) -> dict[str, Any]:
+    body = completion(content)
+    body["choices"][0]["finish_reason"] = "length"
+    body["usage"] = {"prompt_tokens": 4316, "completion_tokens": out, "total_tokens": 4316 + out,
+                     "completion_tokens_details": {"reasoning_tokens": reasoning}}
+    return body
+
+
+def test_AC_LLM_28_small_server_context_is_named_and_not_retried():
+    from pydantic import BaseModel
+
+    from umr.llm.structured import complete_validated
+
+    class Out(BaseModel):
+        findings: list[Any]
+
+    calls = []
+
+    def handler(r: httpx2.Request) -> httpx2.Response:
+        calls.append(r)
+        return httpx2.Response(200, json=truncated("", 3876, reasoning=3876))
+
+    with pytest.raises(LlmError, match=r"ran out of context.*about 8,192 tokens.*Context Length") as exc:
+        complete_validated(openai_provider(handler), system="S", cache_prefix="M", prompt="T", model_cls=Out)
+    assert "3,876 of them reasoning" in str(exc.value)
+    assert len(calls) == 1
+
+
+def test_AC_LLM_28_output_limit_reached_suggests_max_output_tokens():
+    p = openai_provider(lambda r: httpx2.Response(200, json=truncated('{"findings": [', 16000)))
+    with pytest.raises(LlmError, match=r"reached max_output_tokens \(16,000\)"):
+        call(p)
+
+
+def test_AC_LLM_28_complete_json_despite_length_is_accepted():
+    p = openai_provider(lambda r: httpx2.Response(200, json=truncated('{"findings": []}', 10)))
+    assert call(p).data == {"findings": []}

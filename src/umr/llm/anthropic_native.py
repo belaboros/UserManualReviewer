@@ -9,7 +9,7 @@ from typing import Any
 import anthropic
 
 from umr.domain import Usage
-from umr.llm.base import LlmError, LlmProvider, LlmResult, ProviderConfig, StructuredOutput
+from umr.llm.base import LlmError, LlmProvider, LlmResult, ProviderConfig, StructuredOutput, token_limit_error
 from umr.llm.calllog import CallRecord
 from umr.llm.config import get_api_key
 from umr.llm.cost import ANTHROPIC_CACHE_READ_FACTOR, ANTHROPIC_CACHE_WRITE_FACTOR, cost_usd
@@ -124,7 +124,12 @@ class AnthropicProvider(LlmProvider):
             raise LlmError(f"{self.name}: the model declined the request"
                            + (f" (category: {category})" if category else ""))
         text = "".join(getattr(b, "text", "") for b in response.content if getattr(b, "type", "") == "text")
-        return LlmResult(data=extract_json(text), raw_text=text, usage=self.usage_from(response, duration),
+        usage = self.usage_from(response, duration)
+        data = extract_json(text)
+        if data is None and getattr(response, "stop_reason", None) == "max_tokens":
+            raise token_limit_error(self.name, input_tokens=usage.input_tokens, output_tokens=usage.output_tokens,
+                                    max_output_tokens=self.config.max_output_tokens)
+        return LlmResult(data=data, raw_text=text, usage=usage,
                          model=getattr(response, "model", "") or self.config.model)
 
     def usage_from(self, response: Any, duration_s: float) -> Usage:

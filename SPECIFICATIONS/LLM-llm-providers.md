@@ -129,6 +129,7 @@ them). `umr providers --test NAME` sends one tiny request to check URL, model an
 | AC-LLM-25 | any call | it is logged | one-line summaries on the `umr.llm` logger, printed by `umr -v` and shown in the GUI run log |
 | AC-LLM-26 | `umr providers --test NAME` | run | one tiny structured request; prints OK with the answer, or FAILED with the error and the log file |
 | AC-LLM-27 | a request carrying an API key | logged | the key never appears in the log; `UMR_LLM_LOG=0` turns the file log off |
+| AC-LLM-28 | the model stops at a token limit (`length` / `max_tokens`) with no JSON | call | `LlmError` at once (no retry) giving tokens used and whether to raise the server's context length or `max_output_tokens` |
 
 ## Examples
 ```yaml
