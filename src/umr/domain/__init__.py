@@ -7,6 +7,7 @@ from umr.domain.models import (
     Finding,
     Journey,
     Link,
+    LlmCallStats,
     Location,
     Manual,
     Page,
@@ -21,5 +22,6 @@ from umr.domain.models import (
 
 __all__ = [
     "SEVERITY_ORDER", "Category", "CheckError", "CheckResult", "CodeBlock", "Finding", "Journey", "Link",
-    "Location", "Manual", "Page", "ReviewRun", "Scope", "Score", "Section", "Severity", "Tier", "Usage",
+    "LlmCallStats", "Location", "Manual", "Page", "ReviewRun", "Scope", "Score", "Section", "Severity", "Tier",
+    "Usage",
 ]

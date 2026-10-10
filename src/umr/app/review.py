@@ -43,7 +43,7 @@ def _run_check(check: Check, ctx: CheckContext) -> CheckResult:
     except Exception as e:  # a failing check never aborts the run
         findings, error = [], f"{type(e).__name__}: {e}"
     return CheckResult(check_id=check.id, tier=check.tier, findings=findings, usage=ctx.usage,
-                       error=error, duration_s=time.perf_counter() - t0)
+                       llm_stats=ctx.llm_stats, error=error, duration_s=time.perf_counter() - t0)
 
 
 class ReviewService:
@@ -111,10 +111,11 @@ class ReviewService:
         order = {c.id: i for i, c in enumerate(checks)}
         results.sort(key=lambda r: order[r.check_id])
         run.findings = self._dedupe([f for r in results for f in r.findings])
-        for n, f in enumerate(run.findings, 1):
-            f.id = f"F{n:03d}"
+        for n, finding in enumerate(run.findings, 1):
+            finding.id = f"F{n:03d}"
         for r in results:
             run.usage.add(r.usage)
+            run.llm_stats.add(r.llm_stats)
             run.check_durations[r.check_id] = round(r.duration_s, 3)
             if r.error:
                 run.errors.append(CheckError(check_id=r.check_id, message=r.error))

@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, ClassVar
 
-from umr.domain import Category, Finding, Journey, Scope, Tier, Usage
+from umr.domain import Category, Finding, Journey, LlmCallStats, Scope, Tier, Usage
 
 if TYPE_CHECKING:
     from umr.llm.base import LlmProvider
@@ -17,6 +17,7 @@ class CheckContext:
     journey: Journey
     provider: LlmProvider | None = None
     usage: Usage = field(default_factory=Usage)
+    llm_stats: LlmCallStats = field(default_factory=LlmCallStats)
 
 
 class Check(ABC):

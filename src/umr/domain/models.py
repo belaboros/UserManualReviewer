@@ -207,6 +207,25 @@ class Usage(BaseModel):
         self.calls += other.calls
 
 
+class LlmCallStats(BaseModel):
+    """Structured-output reliability of LLM calls (used by the LLM evaluation, ADR-0013)."""
+
+    calls: int = 0
+    valid_first_try: int = 0
+    retried: int = 0
+    failed: int = 0
+
+    def add(self, other: LlmCallStats) -> None:
+        self.calls += other.calls
+        self.valid_first_try += other.valid_first_try
+        self.retried += other.retried
+        self.failed += other.failed
+
+    @property
+    def valid_output_rate(self) -> float:
+        return self.valid_first_try / self.calls if self.calls else 1.0
+
+
 class CheckError(BaseModel):
     check_id: str
     message: str
@@ -217,6 +236,7 @@ class CheckResult(BaseModel):
     tier: Tier
     findings: list[Finding] = Field(default_factory=list)
     usage: Usage = Field(default_factory=Usage)
+    llm_stats: LlmCallStats = Field(default_factory=LlmCallStats)
     error: str | None = None
     duration_s: float = 0.0
 
@@ -234,6 +254,7 @@ class ReviewRun(BaseModel):
     findings: list[Finding] = Field(default_factory=list)
     scores: list[Score] = Field(default_factory=list)
     usage: Usage = Field(default_factory=Usage)
+    llm_stats: LlmCallStats = Field(default_factory=LlmCallStats)
     errors: list[CheckError] = Field(default_factory=list)
     check_durations: dict[str, float] = Field(default_factory=dict)
 

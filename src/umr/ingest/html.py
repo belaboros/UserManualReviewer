@@ -28,7 +28,7 @@ def parse_html(manual_id: str, rel_path: str, abs_path: Path) -> Page:
             plain_lines[n] = ""
 
     anchors: list[str] = []
-    for tag in soup.find_all(attrs={"id": True}):
+    for tag in soup.find_all(id=True):
         anchors.append(str(tag["id"]))
     for tag in soup.find_all("a", attrs={"name": True}):
         anchors.append(str(tag["name"]))
