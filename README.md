@@ -44,9 +44,13 @@ uv run umr compare samples/shopflow claude-sonnet gpt    # two models side by si
 uv run umr eval --model local-ollama                     # how good is this model for the task?
 uv run umr eval --leaderboard                            # all evaluated models, ranked
 uv run umr checks                                        # list checks
+uv run umr providers --test local-lmstudio               # one tiny request to check URL, model, JSON mode
+uv run umr -v review samples/shopflow --model local-lmstudio  # print each LLM request and response
 ```
 
 Runs are saved in `~/.user-manual-reviewer/runs/`, evaluations in `~/.user-manual-reviewer/evals/`.
+Every LLM request and response (URL, model, full body, and the server's error body on failure) is logged in
+`~/.user-manual-reviewer/logs/llm-calls-YYYY-MM-DD.jsonl`; the GUI run log shows a line per call.
 
 ### Development
 

@@ -89,6 +89,16 @@ If invalid, it calls once more with the same prefix and the prompt plus `YOUR PR
 <error>`; still invalid raises `LlmError`. `stats` (`LlmCallStats`) gets `calls += 1` and exactly one of
 `valid_first_try`, `retried`, `failed`; `usage` receives every call's usage, also when the call fails.
 
+### Call log
+Every request and response is written to `~/.user-manual-reviewer/logs/llm-calls-YYYY-MM-DD.jsonl`
+(folder from `UMR_LOG_DIR`), one JSON object per line, linked by `call_id`: `request` (URL, model, full body),
+then `response` (raw text, finish reason, usage, full SDK response) or `error` (type, message, HTTP status,
+server response body, which is where local servers such as LM Studio and Ollama explain what went wrong).
+Only bodies are logged, never headers, so API keys stay out; keys named `api_key`, `authorization` or
+`x-api-key` are redacted anywhere in a body. A failure to write the log is a warning, never a failed check.
+Short summaries go to the `umr.llm` Python logger at INFO (`umr -v ...` prints them; the GUI run log shows
+them). `umr providers --test NAME` sends one tiny request to check URL, model and JSON mode.
+
 ## Acceptance criteria
 | Id | Given | When | Then |
 |---|---|---|---|
@@ -113,6 +123,12 @@ If invalid, it calls once more with the same prefix and the prompt plus `YOUR PR
 | AC-LLM-19 | any adapter call | call | `duration_s` > 0 and `calls` = 1 |
 | AC-LLM-20 | Claude stops with `refusal` | call | `LlmError` "declined" |
 | AC-LLM-21 | an unknown field (typo) in a provider | `load_providers` | error naming the field and its line |
+| AC-LLM-22 | any call, either adapter | before it is sent | a `request` entry in the call log with call id, provider, full URL, model and the full request body |
+| AC-LLM-23 | a successful call | after it returns | a `response` entry with the same call id, raw text, finish reason, duration and the full response |
+| AC-LLM-24 | an HTTP error, timeout or connection error | after it fails | an `error` entry with the status code and the server's response body; the CLI names the log file |
+| AC-LLM-25 | any call | it is logged | one-line summaries on the `umr.llm` logger, printed by `umr -v` and shown in the GUI run log |
+| AC-LLM-26 | `umr providers --test NAME` | run | one tiny structured request; prints OK with the answer, or FAILED with the error and the log file |
+| AC-LLM-27 | a request carrying an API key | logged | the key never appears in the log; `UMR_LLM_LOG=0` turns the file log off |
 
 ## Examples
 ```yaml

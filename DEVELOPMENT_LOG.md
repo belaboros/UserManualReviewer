@@ -21,3 +21,8 @@
 - Not yet verified against live LLM APIs (no keys in the build environment). Rule-only review of the samples: 33 findings, rule recall 0.40 of all 68 planted problems (the rest need an LLM), set score 2.1% because the samples are deliberately dense with mistakes.
 - Open questions: split answer-key entries R1/R6 per occurrence; confirm extra UI-label findings in `05-bulk-import.md` and `legacy-sms.md` into the key; tune scoring `k` after testing real manuals.
 - Renamed the test-specification folder `TESTS/` to `TEST_SPECS/`: on macOS's case-insensitive file system `TESTS/` and `tests/` are the same folder.
+
+## 2026-10-10 · LLM call log
+
+- Owner report: local LLM calls fail. Added a call log (AC-LLM-22…27): every request (URL, model, full body) and its response or error (HTTP status and the server's response body) goes to `~/.user-manual-reviewer/logs/llm-calls-YYYY-MM-DD.jsonl`; keys are never logged.
+- `umr -v` prints a summary line per call; the GUI run log shows the same lines; `umr providers --test NAME` sends one tiny request.

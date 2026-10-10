@@ -318,11 +318,13 @@ Long-running work runs in a `QThreadPool` worker; the GUI only receives progress
 | `<journey>/journey.yaml` | Which manuals form one journey, reference files | yes (samples) |
 | `<manual>/manual.yaml` | Manual id, title, version | yes (samples) |
 | `~/.user-manual-reviewer/runs/*.json` | Saved review runs | no |
+| `~/.user-manual-reviewer/logs/llm-calls-*.jsonl` | Every LLM request and response (`umr.llm.calllog`) | no |
 
 ## 14. Cross-cutting concerns
 
 - **Privacy**: manuals are sent only to the model the user picked; local models keep everything on the device. Run files stay local.
 - **Cost**: every run records tokens and estimated cost per check; prices come from the provider config.
+- **Diagnostics**: every LLM call is logged (URL, model, full request body, then the response or the error with the server's body) to a daily JSONL file, without headers, so keys stay out. Summaries go to the `umr.llm` logger, shown by `umr -v` and in the GUI run log.
 - **Errors**: a failing check never aborts the run; it is reported as an error row with its message, and the score notes that the check did not complete.
 - **Determinism**: rule checks are deterministic; LLM checks use temperature 0 where the provider allows it, and runs store the model and prompt version so results can be traced.
 - **Extensibility**: a new check is one class registered in `CheckRegistry` plus its spec and tests; a new provider type is one class implementing `LlmProvider`.

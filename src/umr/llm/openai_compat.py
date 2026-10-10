@@ -9,6 +9,7 @@ import openai
 
 from umr.domain import Usage
 from umr.llm.base import LlmError, LlmProvider, LlmResult, ProviderConfig, StructuredOutput
+from umr.llm.calllog import CallRecord
 from umr.llm.config import get_api_key
 from umr.llm.cost import cost_usd
 from umr.llm.jsonparse import extract_json
@@ -63,24 +64,37 @@ class OpenAICompatibleProvider(LlmProvider):
                  schema_name: str = "findings") -> LlmResult:
         request = self.build_request(system=system, cache_prefix=cache_prefix, prompt=prompt, schema=schema,
                                      schema_name=schema_name)
+        base = (self.config.base_url or "https://api.openai.com/v1").rstrip("/")
+        record = CallRecord(self.name, "openai-compatible", f"{base}/chat/completions", self.config.model,
+                            request).start()
         t0 = time.perf_counter()
         try:
             response = self.client.chat.completions.create(**request)
         except openai.APIStatusError as e:
-            raise LlmError(f"{self.name}: HTTP {e.status_code} from {self.config.base_url or 'OpenAI'}: "
-                           f"{e.message}") from e
+            record.failed(error=e, duration_s=time.perf_counter() - t0, status_code=e.status_code,
+                          body=_response_body(e))
+            raise LlmError(f"{self.name}: HTTP {e.status_code} from {base}: {e.message}") from e
         except openai.APITimeoutError as e:
-            raise LlmError(f"{self.name}: request timed out after {self.config.timeout_s:.0f} s") from e
+            record.failed(error=e, duration_s=time.perf_counter() - t0)
+            raise LlmError(f"{self.name}: request timed out after {self.config.timeout_s:.0f} s "
+                           f"(raise timeout_s in the provider config for slow local models)") from e
         except openai.APIConnectionError as e:
-            raise LlmError(f"{self.name}: cannot connect to {self.config.base_url or 'OpenAI'}: {e}") from e
+            record.failed(error=e, duration_s=time.perf_counter() - t0)
+            raise LlmError(f"{self.name}: cannot connect to {base}: {e}") from e
         except openai.OpenAIError as e:
+            record.failed(error=e, duration_s=time.perf_counter() - t0)
             raise LlmError(f"{self.name}: {type(e).__name__}: {e}") from e
         duration = time.perf_counter() - t0
         if not getattr(response, "choices", None):
+            record.failed(error=LlmError("response has no choices"), duration_s=duration, body=response)
             raise LlmError(f"{self.name}: response has no choices")
-        message = response.choices[0].message
+        choice = response.choices[0]
+        message = choice.message
         text = message.content or ""
-        return LlmResult(data=extract_json(text), raw_text=text, usage=self.usage_from(response, duration),
+        usage = self.usage_from(response, duration)
+        record.ok(raw_text=text, response=response, duration_s=duration, input_tokens=usage.input_tokens,
+                  output_tokens=usage.output_tokens, finish_reason=getattr(choice, "finish_reason", None))
+        return LlmResult(data=extract_json(text), raw_text=text, usage=usage,
                          model=getattr(response, "model", "") or self.config.model)
 
     def usage_from(self, response: Any, duration_s: float) -> Usage:
@@ -93,3 +107,14 @@ class OpenAICompatibleProvider(LlmProvider):
                         output=output_tokens, cache_read=cached)
         return Usage(input_tokens=prompt_tokens, output_tokens=output_tokens, cached_tokens=cached,
                      cost_usd=cost, duration_s=duration_s, calls=1)
+
+
+def _response_body(e: openai.APIStatusError) -> Any:
+    """The server's error body: what local servers put their real error message in."""
+    body = getattr(e, "body", None)
+    if body is not None:
+        return body
+    try:
+        return e.response.text
+    except Exception:  # pragma: no cover
+        return None

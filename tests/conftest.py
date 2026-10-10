@@ -15,6 +15,7 @@ def _isolated_storage(tmp_path_factory: pytest.TempPathFactory, monkeypatch: pyt
     base = tmp_path_factory.mktemp("umr-home")
     monkeypatch.setenv("UMR_RUNS_DIR", str(base / "runs"))
     monkeypatch.setenv("UMR_EVALS_DIR", str(base / "evals"))
+    monkeypatch.setenv("UMR_LOG_DIR", str(base / "logs"))
 
 
 @pytest.fixture

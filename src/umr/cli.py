@@ -61,6 +61,10 @@ def print_run(run: ReviewRun) -> None:
               f"({u.cached_tokens} cached), ~${u.cost_usd:.3f}")
     for e in run.errors:
         print(f"Check failed: {e.check_id}: {e.message}", file=sys.stderr)
+    if run.errors and u.calls:
+        from umr.llm.calllog import log_file
+
+        print(f"LLM requests and responses: {log_file()}", file=sys.stderr)
 
 
 def cmd_review(args: argparse.Namespace) -> int:
@@ -156,10 +160,32 @@ def cmd_providers(args: argparse.Namespace) -> int:
     from umr.llm.config import get_api_key, load_providers
 
     path = _providers_path(args.providers)
+    if args.test:
+        return _test_provider(args.test, args.providers)
     print(f"From {path}:")
     for c in load_providers(path):
         key = "key set" if get_api_key(c) else ("no key needed" if not c.api_key_env else f"${c.api_key_env} missing")
         print(f"  {c.name:<18} {c.adapter:<18} {c.model:<26} {key}")
+    return 0
+
+
+def _test_provider(name: str, providers_file: str | None) -> int:
+    """Send one tiny structured request, to debug a provider's URL, model and JSON mode (AC-LLM-26)."""
+    from umr.llm import calllog
+    from umr.llm.base import LlmError
+
+    provider = _provider(name, providers_file)
+    schema = {"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"],
+              "additionalProperties": False}
+    try:
+        result = provider.complete(system="You answer with JSON only.", cache_prefix="Connection test.",
+                                   prompt='Reply with {"ok": true}.', schema=schema, schema_name="ping")
+    except LlmError as e:
+        print(f"FAILED: {e}\nFull request and response: {calllog.log_file()}", file=sys.stderr)
+        return 3
+    print(f"OK: {name} answered {result.raw_text.strip()[:200]!r} in {result.usage.duration_s:.1f} s "
+          f"({result.usage.input_tokens} in / {result.usage.output_tokens} out tokens)")
+    print(f"Full request and response: {calllog.log_file()}")
     return 0
 
 
@@ -172,6 +198,7 @@ def cmd_gui(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="umr", description="Review related user manuals with rule checks and LLMs.")
     p.add_argument("--providers", help="LLM provider config (default config/llm-providers.yaml)")
+    p.add_argument("-v", "--verbose", action="store_true", help="print every LLM request and response summary")
     sub = p.add_subparsers(dest="command", required=True)
 
     r = sub.add_parser("review", help="review a journey or a manual folder")
@@ -200,13 +227,23 @@ def build_parser() -> argparse.ArgumentParser:
     e.set_defaults(func=cmd_eval)
 
     sub.add_parser("checks", help="list available checks").set_defaults(func=cmd_checks)
-    sub.add_parser("providers", help="list configured LLM providers").set_defaults(func=cmd_providers)
+    pr = sub.add_parser("providers", help="list configured LLM providers")
+    pr.add_argument("--test", metavar="NAME", help="send one tiny request to this provider and show the result")
+    pr.set_defaults(func=cmd_providers)
     sub.add_parser("gui", help="start the desktop app").set_defaults(func=cmd_gui)
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.verbose:
+        import logging
+
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(logging.Formatter("%(asctime)s %(message)s", "%H:%M:%S"))
+        llm_logger = logging.getLogger("umr.llm")
+        llm_logger.addHandler(handler)
+        llm_logger.setLevel(logging.INFO)
     try:
         return int(args.func(args))
     except IngestError as e:
@@ -216,7 +253,9 @@ def main(argv: list[str] | None = None) -> int:
         from umr.llm.base import LlmError
 
         if isinstance(e, LlmError):
-            print(f"LLM error: {e}", file=sys.stderr)
+            from umr.llm.calllog import log_file
+
+            print(f"LLM error: {e}\nFull request and response: {log_file()}", file=sys.stderr)
             return 3
         raise
 

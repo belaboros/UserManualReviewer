@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 from pathlib import Path
+from typing import Any
 
 import pytest
 from gui_helpers import (
@@ -216,3 +218,11 @@ def test_AC_GUI_20_model_b_runs_comparison(make_window, qtbot):
     assert "[fake-a]" not in log and "[A] ✓ stub-value finished" in log and "[B]" in log
     assert w.setup.progress.value() == 100
     assert w.run is comparison.run_a
+
+
+def test_AC_LLM_25_gui_run_log_shows_llm_lines(make_window: Any, qtbot: Any):
+    window = make_window()
+    worker = threading.Thread(target=lambda: logging.getLogger("umr.llm").info("→ [abc] local-lmstudio POST x"))
+    worker.start()
+    worker.join()
+    qtbot.waitUntil(lambda: "local-lmstudio POST x" in window.setup.log.toPlainText(), timeout=3000)

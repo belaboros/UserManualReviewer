@@ -29,10 +29,12 @@ from umr.gui.dashboard_view import DashboardView
 from umr.gui.eval_view import EvaluateView, LeaderboardView
 from umr.gui.findings_view import FindingsView
 from umr.gui.integrations import ProviderCatalog
+from umr.gui.llm_log import LlmLogBridge
 from umr.gui.setup_view import SetupView
 from umr.gui.viewmodels import check_infos, friendly_error, progress_line
 from umr.gui.workers import Task, split_progress_args, start_task
 from umr.ingest import load_journey
+from umr.llm import calllog
 from umr.scoring import ScoringConfig
 from umr.storage import RunStore
 
@@ -101,6 +103,9 @@ class MainWindow(QMainWindow):
         lay.addWidget(self.nav)
         lay.addWidget(self.stack, 1)
         self.setCentralWidget(central)
+
+        self.llm_log = LlmLogBridge()
+        self.llm_log.line.connect(self.setup.append_log)
 
         self._build_menus()
         self.setup.open_file_requested.connect(self.choose_journey_file)
@@ -341,6 +346,7 @@ class MainWindow(QMainWindow):
     def _on_task_failed(self, exc: BaseException) -> None:
         self._end_task()
         self.setup.append_log(f"Review failed: {type(exc).__name__}: {exc}")
+        self.setup.append_log(f"LLM requests and responses: {calllog.log_file()}")
         self.task_ended.emit("failed")
         self.show_exception(exc)
 
@@ -543,5 +549,6 @@ class MainWindow(QMainWindow):
             if task is not None:
                 task.cancel()
         self.pool.waitForDone(3000)
+        self.llm_log.close()
         super().closeEvent(event)
 

@@ -10,6 +10,7 @@ import anthropic
 
 from umr.domain import Usage
 from umr.llm.base import LlmError, LlmProvider, LlmResult, ProviderConfig, StructuredOutput
+from umr.llm.calllog import CallRecord
 from umr.llm.config import get_api_key
 from umr.llm.cost import ANTHROPIC_CACHE_READ_FACTOR, ANTHROPIC_CACHE_WRITE_FACTOR, cost_usd
 from umr.llm.jsonparse import extract_json
@@ -70,16 +71,32 @@ class AnthropicProvider(LlmProvider):
         return request
 
     def _send(self, request: dict[str, Any]) -> Any:
+        base = (self.config.base_url or "https://api.anthropic.com").rstrip("/")
+        record = CallRecord(self.name, "anthropic", f"{base}/v1/messages", self.config.model, request).start()
+        t0 = time.perf_counter()
         try:
-            return self.client.messages.create(**request)
+            response = self.client.messages.create(**request)
         except anthropic.APIStatusError as e:
+            record.failed(error=e, duration_s=time.perf_counter() - t0, status_code=e.status_code,
+                          body=getattr(e, "body", None))
             raise _StatusError(e) from e
         except anthropic.APITimeoutError as e:
+            record.failed(error=e, duration_s=time.perf_counter() - t0)
             raise LlmError(f"{self.name}: request timed out after {self.config.timeout_s:.0f} s") from e
         except anthropic.APIConnectionError as e:
+            record.failed(error=e, duration_s=time.perf_counter() - t0)
             raise LlmError(f"{self.name}: cannot connect to the Anthropic API: {e}") from e
         except anthropic.AnthropicError as e:
+            record.failed(error=e, duration_s=time.perf_counter() - t0)
             raise LlmError(f"{self.name}: {type(e).__name__}: {e}") from e
+        text = "".join(getattr(b, "text", "") for b in getattr(response, "content", []) or []
+                       if getattr(b, "type", "") == "text")
+        usage = getattr(response, "usage", None)
+        record.ok(raw_text=text, response=response, duration_s=time.perf_counter() - t0,
+                  input_tokens=getattr(usage, "input_tokens", 0) or 0,
+                  output_tokens=getattr(usage, "output_tokens", 0) or 0,
+                  finish_reason=getattr(response, "stop_reason", None))
+        return response
 
     def complete(self, *, system: str, cache_prefix: str, prompt: str, schema: dict[str, Any],
                  schema_name: str = "findings") -> LlmResult:
