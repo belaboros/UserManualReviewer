@@ -59,7 +59,7 @@ Then, for detail: [feature list](SPECIFICATIONS/FEATURES.md) and the specs in `S
 docs/architecture/   architecture design (start here)
 docs/adr/            architecture decision records
 SPECIFICATIONS/      feature specs with acceptance criteria (source of truth)
-TEST_SPECS/               test specifications and traceability
+TEST_SPECS/          test specifications and traceability
 src/umr/             application code (one package per building block)
 tests/               automated tests, named after acceptance criteria
 scripts/             traceability report generator
