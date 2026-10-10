@@ -1,0 +1,8 @@
+# Quality score parameters, see docs/adr/0008-quality-score.md
+severity_weights:
+  critical: 10
+  major: 5
+  minor: 2
+  info: 0.5
+k: 20            # higher = more forgiving
+min_words: 300   # floor so tiny pages don't drop to ~0 over one issue

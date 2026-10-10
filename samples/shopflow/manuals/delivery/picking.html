@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Picking and packing</title></head>
+<body>
+<h1>1. Picking and packing</h1>
+
+<h2>1.1 The picking queue</h2>
+<p>Orders appear in the <strong>Picking queue</strong> once they have the status <strong>Paid</strong> and have been <strong>released</strong> by the warehouse supervisor. Orders that are not released stay invisible to warehouse operators.</p>
+<p>To open the queue, log in to <code>https://shopflow.example.com/wms</code> with your <strong>Warehouse role</strong> and click <strong>Picking</strong>.</p>
+
+<img src="images/picking-queue.png">
+
+<h2>1.2 Picking an order</h2>
+<ol>
+  <li>Select the order with the highest priority in the queue. Orders close to breaching the picking SLA are shown in red.</li>
+  <li>Scan each product's barcode with the handheld scanner.</li>
+  <li>When all line items are scanned, click <strong>Picking complete</strong>.</li>
+</ol>
+
+<h2>1.3 Packing</h2>
+<ol>
+  <li>Choose a box size that fits all items.</li>
+  <li>Weigh the parcel. The maximum parcel weight is <strong>30 kg</strong>.</li>
+  <li>Print and attach the shipping label.</li>
+  <li>Click <strong>Ready for dispatch</strong>.</li>
+</ol>
+
+<h2>1.4 Address problems</h2>
+<p>If the delivery address looks wrong, follow the procedure in the Order Capturing manual, section <a href="../order-capturing/02-creating-an-order.md#delivery-address-validation">"Delivery Address Validation"</a>.</p>
+</body>
+</html>

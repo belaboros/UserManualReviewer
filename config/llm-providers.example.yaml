@@ -1,0 +1,41 @@
+# Copy to config/llm-providers.yaml (git-ignored) and adjust.
+# API keys are read from the environment variable named in api_key_env (or from .env).
+# Model names and prices are examples; check your provider's current values.
+providers:
+  - name: claude-sonnet
+    adapter: anthropic
+    model: claude-sonnet-5-5
+    api_key_env: ANTHROPIC_API_KEY
+    context_tokens: 1000000
+    max_concurrency: 4
+    price_per_mtok: { input: 2.00, output: 10.00, cache_read: 0.20 }
+
+  - name: gpt
+    adapter: openai-compatible
+    base_url: https://api.openai.com/v1
+    model: gpt-5
+    api_key_env: OPENAI_API_KEY
+    structured_output: json_schema
+
+  - name: gemini
+    adapter: openai-compatible
+    base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+    model: gemini-2.5-pro
+    api_key_env: GEMINI_API_KEY
+    structured_output: json_schema
+
+  - name: local-ollama
+    adapter: openai-compatible
+    base_url: http://localhost:11434/v1
+    model: qwen3:32b
+    structured_output: json_object
+    context_tokens: 32768
+    max_concurrency: 1
+
+  - name: local-lmstudio
+    adapter: openai-compatible
+    base_url: http://localhost:1234/v1
+    model: local-model
+    structured_output: json_schema
+    context_tokens: 32768
+    max_concurrency: 1

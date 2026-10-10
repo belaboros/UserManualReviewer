@@ -1,0 +1,28 @@
+{
+  "_comment": "Actual UI labels in ShopFlow 3.4, exported from the localisation files. Use as ground truth for UI label checks.",
+  "oms": {
+    "login.button": "Sign in",
+    "dashboard.newOrder": "New Order",
+    "cart.add": "Add to cart",
+    "customer.create": "Create customer",
+    "order.submit": "Place Order",
+    "menu.preferences": "Preferences",
+    "menu.admin.roles": "Admin › Users › Roles"
+  },
+  "wms": {
+    "picking.menu": "Picking",
+    "picking.complete": "Picking complete",
+    "packing.ready": "Ready for dispatch",
+    "dispatch.load": "Load parcel",
+    "delivery.done": "Mark as delivered",
+    "delivery.failed": "Delivery failed",
+    "order.cancel": "Cancel order",
+    "dispatch.routePlanning": "Dispatch › Route planning"
+  },
+  "admin": {
+    "notifications.email": "Admin › Notifications › E-mail",
+    "notifications.templates": "Admin › Notifications › Templates",
+    "template.save": "Save",
+    "template.preview": "Preview"
+  }
+}

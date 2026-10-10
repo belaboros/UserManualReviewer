@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Dispatch and delivery</title></head>
+<body>
+<h1>2. Dispatch and delivery</h1>
+
+<h2>2.1 Loading parcels</h2>
+<p>Parcels heavier than <strong>25 kg</strong> must not be loaded onto delivery vans. Return them to packing to be split.</p>
+<p>Orders without a postal code cannot be dispatched. The parcel is moved to the <strong>Address hold</strong> shelf.</p>
+<ol>
+  <li>Scan the parcel label.</li>
+  <li>Assign the parcel to a route.</li>
+  <li>Click <strong>Load</strong>. The order status changes to <strong>Shipped</strong>.</li>
+  <li>Send the ASN to the carrier.</li>
+</ol>
+<p>If your site still uses the <strong>Classic Dispatch</strong> screen, click <strong>Dispatch › Classic › Load all</strong> instead.</p>
+
+<img src="images/route-assignment.png" alt="Route assignment screen">
+
+<h2>2.2 Delivering to the consignee</h2>
+<ol>
+  <li>When the driver starts the route, the customer receives an <strong>"Out for delivery" SMS</strong>.</li>
+  <li>Hand over the parcel and collect a signature on the handheld device.</li>
+  <li>Click <strong>Delivered</strong>. The delivery log is written to <code>/var/log/shopflow/delivery.log</code>.</li>
+</ol>
+
+<h2>2.3 Failed delivery</h2>
+<p>If nobody is at home, click <strong>Delivery failed</strong>. The customer is notified automatically and can choose a new delivery date using the <strong>reschedule link</strong> in the notification.</p>
+<p>After three failed attempts the parcel is returned to the warehouse.</p>
+
+<h2>2.4 Planning routes</h2>
+<p>At the end of each day the dispatcher creates the next day's routes in <strong>Dispatch › Route planning</strong>. Each route has a van, a driver and a list of postal-code areas.</p>
+
+<h2>2.5 Cancelling a shipment</h2>
+<p>Orders can be cancelled at any time until they reach the status <strong>Shipped</strong>. To cancel, click <strong>Cancel order</strong> in the order details.</p>
+</body>
+</html>

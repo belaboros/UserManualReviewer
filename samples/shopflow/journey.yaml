@@ -1,0 +1,10 @@
+name: ShopFlow order to delivery
+description: >
+  A customer order from capture through picking, packing, dispatch and delivery,
+  with customer notifications along the way.
+manuals:
+  - manuals/order-capturing
+  - manuals/delivery
+  - manuals/notification
+reference:
+  ui_strings: reference/ui-strings.json

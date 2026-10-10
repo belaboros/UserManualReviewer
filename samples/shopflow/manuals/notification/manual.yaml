@@ -1,0 +1,4 @@
+id: notification
+title: ShopFlow Notification Service
+version: "3.4"
+entry: index.md
