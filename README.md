@@ -30,14 +30,14 @@ DEVELOPMENT_LOG.md   progress log
 
 ## Sample manuals
 
-`samples/shopflow/` holds three manuals of a fictional e-commerce system (order capturing, delivery, notifications) that together form one user journey. They contain deliberately planted mistakes, listed in [samples/shopflow/ANSWER_KEY.md](samples/shopflow/ANSWER_KEY.md), which `umr eval` uses to score LLMs (see ADR-0013).
+`samples/shopflow/` holds three manuals of a fictional e-commerce system (order capturing, delivery, notifications) that together form one user journey. They contain deliberately planted mistakes, listed in [samples/shopflow/ANSWER_KEY.md](samples/shopflow/ANSWER_KEY.md), with a machine-readable version (`expected-findings.yaml`, added with the EVAL spec) that `umr eval` uses to score LLMs (see ADR-0013).
 
 ## Roadmap
 
 1. Architecture design and ADRs ← *current*
 2. Feature specifications and test specifications
 3. Implementation: ingest, rule checks, LLM providers, LLM checks, scoring
-4. GUI: dashboard, findings, comparison; evaluation against the answer key
+4. GUI: dashboard, findings, comparison, LLM evaluation and leaderboard
 
 ## License
 
