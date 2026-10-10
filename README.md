@@ -25,6 +25,16 @@ uv run umr providers                      # shows which models have a key
 
 Local models: start Ollama or LM Studio, and the `local-ollama` / `local-lmstudio` entries work without a key.
 
+### VS Code
+
+Open the folder in VS Code, run `uv sync` once, and accept the recommended Python extensions. Then pick a configuration in **Run and Debug** (⇧⌘D) and press F5:
+
+- **UMR: desktop app** starts the GUI
+- **UMR: review samples (rules only)** / **with a model** run a review in the terminal
+- **UMR: evaluate a model** asks for a provider name and runs the evaluation
+
+API keys can go in a `.env` file in the repo root (git-ignored); the configurations load it. Tests appear in the Testing panel.
+
 ### Command line
 
 ```bash

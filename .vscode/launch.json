@@ -1,0 +1,53 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "UMR: desktop app",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "umr",
+      "args": ["gui"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "UMR: review samples (rules only)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "umr",
+      "args": ["review", "samples/shopflow"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "UMR: review samples with a model",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "umr",
+      "args": ["review", "samples/shopflow", "--model", "${input:model}"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "UMR: evaluate a model",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "umr",
+      "args": ["eval", "--model", "${input:model}"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "model",
+      "type": "promptString",
+      "description": "Provider name from config/llm-providers.yaml",
+      "default": "claude-sonnet"
+    }
+  ]
+}
