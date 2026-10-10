@@ -9,7 +9,7 @@ The owner wants a desktop application with a user-friendly GUI that shows review
 ## Decision
 Use **Python 3.12** for all code and **PySide6** (Qt 6, official Qt for Python bindings, LGPL) for the GUI:
 - Qt Widgets for the main window, tables and forms
-- Qt Charts for gauges, bar charts and heatmaps
+- custom-painted widgets for score rings, bar charts and heatmaps (Qt Charts available if needed)
 - `QTextBrowser` to render passages and comparisons as HTML (lighter than `QWebEngineView`, which can be added later if richer HTML is needed)
 
 Tooling: `uv` for environments and dependencies, `pytest` and `pytest-qt` for tests, `ruff` for lint and format, `mypy` for types.
