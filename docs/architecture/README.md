@@ -11,7 +11,7 @@
 - gaps in the end-to-end user journey that the manuals together are supposed to cover
 - terminology drift, UI label mismatches, prerequisite gaps, step order problems, undefined terms, stale versions, conflicting values, missing error paths, malformed code
 
-Every finding points to the exact file, line and quoted text. The application computes a **quality score** (100% = no problems) for the whole set, each manual and each page, and can run the same review on **two LLMs side by side** to compare them.
+Every finding points to the exact file, line and quoted text. The application computes a **quality score** (100% = no problems) for the whole set, each manual and each page, can run the same review on **two LLMs side by side** to compare them, and can **evaluate a new LLM** against sample manuals with a known answer key.
 
 ## 2. Quality goals
 
@@ -50,8 +50,8 @@ The application has no server of its own. Manual text leaves the computer only w
 ```mermaid
 flowchart TB
     gui[gui<br/>PySide6 windows, views, charts]
-    cli[cli<br/>headless review for scripts and CI]
-    app[app<br/>ReviewService, CompareService]
+    cli[cli<br/>headless review and eval]
+    app[app<br/>ReviewService, CompareService, EvalService]
     ingest[ingest<br/>parse .md / .html into a Corpus]
     checks[checks<br/>rule checks + LLM checks]
     llm[llm<br/>provider adapters]
@@ -83,9 +83,9 @@ Dependencies point downwards only. `domain` imports nothing from the project. `g
 | `llm` | Send a prompt, get validated structured output back, report tokens, cost and time | `LlmProvider`, `OpenAICompatibleProvider`, `AnthropicProvider`, `FakeProvider` |
 | `scoring` | Turn findings into scores for page, manual and set | `score_run()` |
 | `storage` | Save and load review runs as JSON; load config files | `RunStore`, `load_providers()` |
-| `app` | Orchestrate a review or a comparison; progress, cancellation, verification of quotes | `ReviewService`, `CompareService` |
+| `app` | Orchestrate a review, a comparison or an evaluation; progress, cancellation, verification of quotes; matching findings to an answer key | `ReviewService`, `CompareService`, `EvalService` |
 | `gui` | Main window, setup view, results dashboard, finding detail, comparison view | `MainWindow`, view models |
-| `cli` | `umr review journey.yaml --checks all --model claude` for automation and tests | — |
+| `cli` | `umr review journey.yaml --checks all --model claude` and `umr eval --model local-qwen` | — |
 
 ## 5. Data model
 
@@ -215,7 +215,27 @@ sequenceDiagram
 
 The comparison view shows three groups (found by both, only A, only B), both quality scores, and the time, tokens and cost of each model. Matching rules are in [ADR-0010](../adr/0010-side-by-side-comparison.md).
 
-## 8. Checks
+## 8. Runtime: evaluating an LLM
+
+`EvalService` answers "how good is this model for reviewing manuals?" ([ADR-0013](../adr/0013-llm-evaluation-benchmark.md)):
+
+```mermaid
+flowchart LR
+    m[Model from<br/>llm-providers.yaml] --> r[Review run on<br/>benchmark journey]
+    b[(Benchmark set<br/>journey.yaml +<br/>expected-findings.yaml)] --> r
+    r --> f[Findings]
+    f --> match[Match to answer key<br/>same rules as comparison]
+    b --> match
+    match --> met[Metrics: recall, precision, F1,<br/>category and severity accuracy,<br/>verified quotes, valid output,<br/>stability, cost, time]
+    met --> s[Eval score 0–100]
+    s --> lb[(Leaderboard)]
+```
+
+- Only LLM-tier categories are scored by default, since rule checks give every model the same result.
+- Findings not in the key are listed as *unexpected*; the owner can confirm them into the key, which is versioned.
+- Results are saved like review runs and appear on the leaderboard (GUI view and `umr eval --leaderboard`).
+
+## 9. Checks
 
 Checks come in two tiers ([ADR-0006](../adr/0006-two-tier-checks.md)):
 
@@ -228,7 +248,7 @@ Some categories use both tiers: the rule tier finds candidates cheaply (for exam
 
 **Prompt layout for caching**: the journey's manual text is always the first, identical block of the prompt, and the check instruction comes after it. Providers that cache prompt prefixes (Claude explicitly, OpenAI and Gemini automatically, local servers through their KV cache) then reuse the manuals across all checks of a run. If the manuals do not fit the model's configured context budget, the check runs per manual pair and per section group instead.
 
-## 9. LLM provider layer
+## 10. LLM provider layer
 
 ```mermaid
 classDiagram
@@ -262,7 +282,7 @@ classDiagram
 
 Providers are listed in `config/llm-providers.yaml` ([ADR-0004](../adr/0004-llm-provider-config-file.md)). API keys are never stored in that file; it names the environment variable that holds the key.
 
-## 10. Quality score
+## 11. Quality score
 
 ```
 penalty  = Σ severity_weight(f) for verified findings f in scope
@@ -272,7 +292,7 @@ score    = 100 × e^(−density / k)
 
 Default weights: critical 10, major 5, minor 2, info 0.5; default `k` = 20. A finding counts toward every page and manual it has a location in; journey-level findings (gaps with no location) count only toward the set score. Details and alternatives considered: [ADR-0008](../adr/0008-quality-score.md).
 
-## 11. GUI
+## 12. GUI
 
 | View | Content |
 |---|---|
@@ -281,21 +301,25 @@ Default weights: critical 10, major 5, minor 2, info 0.5; default `k` = 20. A fi
 | **Findings** | Filterable table (category, severity, manual, verified, source model) |
 | **Finding detail** | Source passages rendered side by side with the quoted text highlighted, explanation, suggested fix |
 | **Compare** | Both found / only A / only B, scores, tokens, cost, duration |
+| **Evaluate** | Pick a model and benchmark, run, see metrics per category, missed and unexpected findings |
+| **Leaderboard** | All evaluated models ranked by eval score, with recall, precision, cost and duration |
 
 Long-running work runs in a `QThreadPool` worker; the GUI only receives progress and result signals. Rich content (passages, the comparison) is rendered as HTML in `QWebEngineView`; charts use Qt Charts ([ADR-0002](../adr/0002-python-and-pyside6.md)).
 
-## 12. Configuration and files
+## 13. Configuration and files
 
 | File | Purpose | In git |
 |---|---|---|
 | `config/llm-providers.yaml` | LLM providers and models | example only (`llm-providers.example.yaml`) |
 | `config/scoring.yaml` | Severity weights, `k`, minimum word count | yes |
+| `config/eval.yaml` | Eval score weights, benchmark sets | yes |
+| `samples/<set>/expected-findings.yaml` | Answer key for a benchmark set | yes |
 | `.env` | API keys | no |
 | `<journey>/journey.yaml` | Which manuals form one journey, reference files | yes (samples) |
 | `<manual>/manual.yaml` | Manual id, title, version | yes (samples) |
 | `~/.user-manual-reviewer/runs/*.json` | Saved review runs | no |
 
-## 13. Cross-cutting concerns
+## 14. Cross-cutting concerns
 
 - **Privacy**: manuals are sent only to the model the user picked; local models keep everything on the device. Run files stay local.
 - **Cost**: every run records tokens and estimated cost per check; prices come from the provider config.
@@ -303,15 +327,16 @@ Long-running work runs in a `QThreadPool` worker; the GUI only receives progress
 - **Determinism**: rule checks are deterministic; LLM checks use temperature 0 where the provider allows it, and runs store the model and prompt version so results can be traced.
 - **Extensibility**: a new check is one class registered in `CheckRegistry` plus its spec and tests; a new provider type is one class implementing `LlmProvider`.
 
-## 14. Development process
+## 15. Development process
 
 Development is specification-driven ([ADR-0012](../adr/0012-specification-driven-development.md)): every feature has a spec in `SPECIFICATIONS/` with numbered acceptance criteria, every criterion has at least one test that names it, and the [development log](../../DEVELOPMENT_LOG.md) records progress. See [SDD_PROCESS.md](../../SDD_PROCESS.md).
 
-## 15. Risks and open questions
+## 16. Risks and open questions
 
 | Risk / question | Mitigation |
 |---|---|
-| LLMs invent problems or quotes | Quote verification; unverified findings excluded from the score; evaluation against the sample answer key |
+| LLMs invent problems or quotes | Quote verification; unverified findings excluded from the score; precision measured by the LLM evaluation |
+| Benchmark samples leak into model training data | Versioned keys; add private benchmark sets kept outside the repository |
 | Large manual sets exceed context windows | Context budget per model; pair-wise and section-group fallback |
 | Local models are weak at structured output | `json_object`/prompt modes, validation with one retry, clear error reporting |
 | Packaging for macOS/Windows/Linux | Decide in a later ADR (PyInstaller or Briefcase) once the app runs |

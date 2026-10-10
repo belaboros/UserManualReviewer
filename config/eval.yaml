@@ -1,0 +1,12 @@
+# LLM evaluation settings, see docs/adr/0013-llm-evaluation-benchmark.md
+score_weights:          # must sum to 1.0
+  f1: 0.50
+  verified_quote_rate: 0.20
+  category_accuracy: 0.15
+  valid_output_rate: 0.15
+match:
+  quote_similarity: 0.8
+benchmarks:
+  shopflow:
+    journey: samples/shopflow/journey.yaml
+    answer_key: samples/shopflow/expected-findings.yaml

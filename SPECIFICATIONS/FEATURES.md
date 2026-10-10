@@ -20,4 +20,4 @@ Each feature gets its own spec in step 2. Ids are permanent.
 | RUN | Review runs: orchestration, progress, cancellation, saving and reopening | – | Not started |
 | COMPARE | Side-by-side comparison of two models | – | Not started |
 | GUI | Setup, dashboard, findings table, finding detail, comparison view | – | Not started |
-| EVAL | Evaluation against an answer key (recall and precision) | – | Not started |
+| EVAL | LLM evaluation: run a model on benchmark sets, score it against `expected-findings.yaml` (recall, precision, F1, verified quotes, valid output, stability, cost, time), eval score and leaderboard | – | Not started |

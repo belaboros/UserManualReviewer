@@ -2,7 +2,7 @@
 
 A desktop application that reviews a set of related user manuals (Markdown or HTML) with rule-based checks and LLMs, and shows the results visually.
 
-It finds duplicate sections, broken links, inconsistencies within a manual, contradictions between manuals, gaps in the end-to-end user journey, terminology drift, UI label mismatches and more. Every finding quotes the exact passage. A quality score (100% = no problems) is computed for the whole set, each manual and each page, and two LLMs can be compared side by side.
+It finds duplicate sections, broken links, inconsistencies within a manual, contradictions between manuals, gaps in the end-to-end user journey, terminology drift, UI label mismatches and more. Every finding quotes the exact passage. A quality score (100% = no problems) is computed for the whole set, each manual and each page, two LLMs can be compared side by side, and a new LLM can be evaluated against sample manuals with a known answer key to see how well it does this job.
 
 > **Status:** design phase. Architecture and ADRs are proposed; feature specifications are next. No application code yet.
 
@@ -30,7 +30,7 @@ DEVELOPMENT_LOG.md   progress log
 
 ## Sample manuals
 
-`samples/shopflow/` holds three manuals of a fictional e-commerce system (order capturing, delivery, notifications) that together form one user journey. They contain deliberately planted mistakes, listed in [samples/shopflow/ANSWER_KEY.md](samples/shopflow/ANSWER_KEY.md), which is used to evaluate the reviewer.
+`samples/shopflow/` holds three manuals of a fictional e-commerce system (order capturing, delivery, notifications) that together form one user journey. They contain deliberately planted mistakes, listed in [samples/shopflow/ANSWER_KEY.md](samples/shopflow/ANSWER_KEY.md), which `umr eval` uses to score LLMs (see ADR-0013).
 
 ## Roadmap
 

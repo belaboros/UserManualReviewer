@@ -14,5 +14,6 @@
 | [0010](0010-side-by-side-comparison.md) | Compare two models by matching findings | Proposed |
 | [0011](0011-testing-strategy.md) | Test with a fake LLM, recorded responses and an answer key | Proposed |
 | [0012](0012-specification-driven-development.md) | Specification-driven development with traceable acceptance criteria | Proposed |
+| [0013](0013-llm-evaluation-benchmark.md) | Evaluate LLMs against answer-keyed sample manuals | Proposed |
 
 New ADRs use [template.md](template.md).

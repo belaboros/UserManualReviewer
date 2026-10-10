@@ -10,7 +10,8 @@ Tests must be fast, free and repeatable, yet we also need to know whether real m
 - **Unit tests** for `domain`, `ingest`, rule checks and `scoring`, with small fixture manuals.
 - **LLM checks** are tested with `FakeProvider`, which returns recorded responses, so prompt building, parsing, validation and quote verification are tested offline.
 - **GUI tests** with `pytest-qt` for the main flows only.
-- **Evaluation** (opt-in, uses real models): run against `samples/shopflow`, compare findings with `expected-findings.yaml` and report recall and precision per category. Not part of the default test run.
+- **Evaluation** (opt-in, uses real models): `umr eval` scores a model against `samples/shopflow/expected-findings.yaml`, see [ADR-0013](0013-llm-evaluation-benchmark.md). Not part of the default test run.
+- A unit test checks that every quote in `expected-findings.yaml` still exists in the sample manuals.
 - Every test names the acceptance criterion it covers, for example `test_AC_LINK_03_broken_anchor_reported`.
 
 ## Consequences
