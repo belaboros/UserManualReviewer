@@ -1,4 +1,4 @@
-"""Generate TESTS/traceability.md: every acceptance criterion and the tests that cover it (ADR-0012).
+"""Generate TEST_SPECS/traceability.md: every acceptance criterion and the tests that cover it (ADR-0012).
 
 Usage: uv run python scripts/traceability.py [--check]
 --check exits with 1 if any criterion has no test.
@@ -41,7 +41,7 @@ def main() -> int:
         spec, _ = criteria[ac]
         covered = "<br>".join(f"`{t.split('::')[1]}`" for t in tests.get(ac, [])) or "**MISSING**"
         lines.append(f"| {ac} | [{spec}](../SPECIFICATIONS/{spec}) | {covered} |")
-    (ROOT / "TESTS" / "traceability.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (ROOT / "TEST_SPECS" / "traceability.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(criteria)} criteria, {len(missing)} without tests" + (f": {', '.join(missing)}" if missing else ""))
     return 1 if missing and "--check" in sys.argv else 0
 

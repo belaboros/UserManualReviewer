@@ -8,10 +8,10 @@ Specifications are the source of truth. Code implements specs; tests prove it. D
 |---|---|---|
 | 1. Specify | `SPECIFICATIONS/<ID>-<name>.md` from [the template](SPECIFICATIONS/TEMPLATE.md), status `Draft` | user stories, acceptance criteria, examples, out-of-scope listed |
 | 2. Approve | status `Approved` | the owner has reviewed and approved the spec |
-| 3. Specify tests | `TESTS/<ID>-<name>.md` from [the template](TESTS/TEMPLATE.md) | every acceptance criterion has at least one test case |
+| 3. Specify tests | `TEST_SPECS/<ID>-<name>.md` from [the template](TEST_SPECS/TEMPLATE.md) | every acceptance criterion has at least one test case |
 | 4. Write failing tests | `tests/...` | tests named after criteria, e.g. `test_AC_LINK_03_...`, fail |
 | 5. Implement | `src/umr/...` | tests pass, lint and type checks pass |
-| 6. Verify | spec status `Implemented`, log entry | every criterion is traced to a passing test in `TESTS/traceability.md` |
+| 6. Verify | spec status `Implemented`, log entry | every criterion is traced to a passing test in `TEST_SPECS/traceability.md` |
 
 ## Rules
 

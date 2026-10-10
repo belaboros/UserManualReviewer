@@ -1,4 +1,4 @@
-"""Tests for spec VERSION: stale version mentions (TESTS/VERSION-stale-versions.md)."""
+"""Tests for spec VERSION: stale version mentions (TEST_SPECS/VERSION-stale-versions.md)."""
 
 from __future__ import annotations
 

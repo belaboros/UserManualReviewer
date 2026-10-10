@@ -43,7 +43,7 @@ Runs are saved in `~/.user-manual-reviewer/runs/`, evaluations in `~/.user-manua
 ```bash
 uv run pytest                              # all tests (no network, no keys)
 uv run ruff check src tests scripts && uv run mypy
-uv run python scripts/traceability.py      # regenerates TESTS/traceability.md
+uv run python scripts/traceability.py      # regenerates TEST_SPECS/traceability.md
 ```
 
 ## Understand the application in two steps
@@ -59,7 +59,7 @@ Then, for detail: [feature list](SPECIFICATIONS/FEATURES.md) and the specs in `S
 docs/architecture/   architecture design (start here)
 docs/adr/            architecture decision records
 SPECIFICATIONS/      feature specs with acceptance criteria (source of truth)
-TESTS/               test specifications and traceability
+TEST_SPECS/               test specifications and traceability
 src/umr/             application code (one package per building block)
 tests/               automated tests, named after acceptance criteria
 scripts/             traceability report generator

@@ -1,4 +1,4 @@
-"""Tests for spec LINK: links, images and orphans (TESTS/LINK-links-images-orphans.md)."""
+"""Tests for spec LINK: links, images and orphans (TEST_SPECS/LINK-links-images-orphans.md)."""
 
 from __future__ import annotations
 

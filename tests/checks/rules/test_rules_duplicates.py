@@ -1,4 +1,4 @@
-"""Tests for spec DUP: duplicate sections (TESTS/DUP-duplicate-sections.md)."""
+"""Tests for spec DUP: duplicate sections (TEST_SPECS/DUP-duplicate-sections.md)."""
 
 from __future__ import annotations
 

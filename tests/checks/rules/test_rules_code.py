@@ -1,4 +1,4 @@
-"""Tests for spec CODE: malformed code blocks (TESTS/CODE-malformed-code.md)."""
+"""Tests for spec CODE: malformed code blocks (TEST_SPECS/CODE-malformed-code.md)."""
 
 from __future__ import annotations
 

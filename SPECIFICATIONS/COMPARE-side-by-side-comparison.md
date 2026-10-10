@@ -4,7 +4,7 @@
 - **Approval:** Approved by the owner's go-ahead on 2026-10-10; to be validated in owner testing.
 - **Related ADRs:** ADR-0010, ADR-0007, ADR-0009
 - **Depends on:** RUN, FIND
-- **Code:** `src/umr/app/compare.py`, `src/umr/app/matching.py` · **Tests:** [TESTS/COMPARE-side-by-side-comparison.md](../TESTS/COMPARE-side-by-side-comparison.md)
+- **Code:** `src/umr/app/compare.py`, `src/umr/app/matching.py` · **Tests:** [TEST_SPECS/COMPARE-side-by-side-comparison.md](../TEST_SPECS/COMPARE-side-by-side-comparison.md)
 
 ## Purpose
 The owner wants to see how two LLMs review the same manuals: which problems both found, which only one found, and what each cost. Matching findings by rules (not by eye, not by another LLM) makes agreement, unique catches and likely hallucinations visible at a glance.

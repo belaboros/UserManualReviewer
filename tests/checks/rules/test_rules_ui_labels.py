@@ -1,4 +1,4 @@
-"""Tests for spec UILABEL: UI labels against ui-strings.json (TESTS/UILABEL-ui-labels.md)."""
+"""Tests for spec UILABEL: UI labels against ui-strings.json (TEST_SPECS/UILABEL-ui-labels.md)."""
 
 from __future__ import annotations
 

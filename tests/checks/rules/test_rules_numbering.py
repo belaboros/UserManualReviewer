@@ -1,4 +1,4 @@
-"""Tests for spec STRUCT: step numbering (TESTS/STRUCT-step-numbering.md)."""
+"""Tests for spec STRUCT: step numbering (TEST_SPECS/STRUCT-step-numbering.md)."""
 
 from __future__ import annotations
 

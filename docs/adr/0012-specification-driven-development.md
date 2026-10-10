@@ -9,7 +9,7 @@ The owner wants specification-driven development done properly: specs are the so
 ## Decision
 - Each feature has a spec in `SPECIFICATIONS/<ID>-<name>.md` with a status (`Draft`, `Approved`, `Implemented`), user stories and numbered acceptance criteria (`AC-<ID>-NN`) written as Given/When/Then.
 - No code is written for a feature before its spec is `Approved` by the owner.
-- Each acceptance criterion has at least one test whose name contains the criterion id; `TESTS/traceability.md` is generated from test names.
+- Each acceptance criterion has at least one test whose name contains the criterion id; `TEST_SPECS/traceability.md` is generated from test names.
 - Code changes that alter behaviour update the spec in the same pull request; specs are never edited to match a bug.
 - `DEVELOPMENT_LOG.md` records each feature's progress.
 - The full process is in [SDD_PROCESS.md](../../SDD_PROCESS.md).

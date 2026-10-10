@@ -1,6 +1,6 @@
 # Feature list
 
-Ids are permanent. Coverage of every acceptance criterion: [TESTS/traceability.md](../TESTS/traceability.md).
+Ids are permanent. Coverage of every acceptance criterion: [TEST_SPECS/traceability.md](../TEST_SPECS/traceability.md).
 
 | Id | Feature | Spec | Status |
 |---|---|---|---|

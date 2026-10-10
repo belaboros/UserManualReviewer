@@ -4,7 +4,7 @@
 - **Approval:** Approved by the owner's go-ahead on 2026-10-10; to be validated in owner testing.
 - **Related ADRs:** ADR-0013, ADR-0010, ADR-0011, ADR-0007, ADR-0009
 - **Depends on:** RUN, FIND, COMPARE (matching rules)
-- **Code:** `src/umr/app/evaluation.py`, `src/umr/storage/evals.py`, `samples/shopflow/expected-findings.yaml` · **Tests:** [TESTS/EVAL-llm-evaluation.md](../TESTS/EVAL-llm-evaluation.md)
+- **Code:** `src/umr/app/evaluation.py`, `src/umr/storage/evals.py`, `samples/shopflow/expected-findings.yaml` · **Tests:** [TEST_SPECS/EVAL-llm-evaluation.md](../TEST_SPECS/EVAL-llm-evaluation.md)
 
 ## Purpose
 When the owner tries a new LLM, they want one trustworthy answer to "how good is this model at reviewing manuals, and what does it cost?" The evaluation runs a normal review on a benchmark set whose planted problems are known, matches the findings to the answer key deterministically, and reports metrics, an eval score and a leaderboard.
